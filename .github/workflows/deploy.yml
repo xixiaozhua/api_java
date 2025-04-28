@@ -27,6 +27,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          
           script: |
             # 强制覆盖旧文件并重启
             pkill -f "java -jar app.jar" || true  # 终止已有进程:ml-citation{ref="3,7" data="citationList"}
