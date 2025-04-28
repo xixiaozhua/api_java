@@ -30,3 +30,4 @@ jobs:
             pkill -f "java -jar app.jar" || true  # 终止已有进程:ml-citation{ref="3,7" data="citationList"}
             cp target/app.jar /opt/app/
             nohup java -jar /opt/app/app.jar > app.log 2>&1 &
+            
