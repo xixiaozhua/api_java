@@ -29,4 +29,4 @@ jobs:
 
           script: |  # 执行部署脚本，例如停止旧服务，启动新服务等
             cd /var/www/project  # 切换到应用目录
-            git pull origin main  # 拉取最新代码，根据您的分支名修改
+            
