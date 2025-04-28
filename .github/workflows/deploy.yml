@@ -17,7 +17,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-
       # 3. Maven 打包
       - run: mvn clean package -DskipTests  # 跳过测试加快速度:ml-citation{ref="1,4" data="citationList"}
 
