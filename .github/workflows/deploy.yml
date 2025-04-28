@@ -26,17 +26,10 @@ jobs:
         with:
             host: 47.99.171.17
             username: deploye
-            key: -----BEGIN OPENSSH PRIVATE KEY-----
-              b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
-              QyNTUxOQAAACAaVvd0M3EGcwuMcjy1goQBEZoU4Fl/0dGHUF3Yv1aOeAAAAKDg8DNR4PAz
-              UQAAAAtzc2gtZWQyNTUxOQAAACAaVvd0M3EGcwuMcjy1goQBEZoU4Fl/0dGHUF3Yv1aOeA
-              AAAEBfSBSgks41kM16VMIQcr/vmdBD2sVq6pYgDhuHQRcVfRpW93QzcQZzC4xyPLWChAER
-              mhTgWX/R0YdQXdi/Vo54AAAAGWdpdGh1Yi1hY3Rpb25zLWRlcGxveS1rZXkBAgME
-              -----END OPENSSH PRIVATE KEY-----
+            key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINSVwQNCnzjYvUueu9l5fx1JXVVLjy6t++Bu1dSIxdUK github-actions-deploy-key
           
             script: |
-              # 强制覆盖旧文件并重启
-              pkill -f "java -jar app.jar" || true  # 终止已有进程:ml-citation{ref="3,7" data="citationList"}
+              pkill -f "java -jar app.jar" || true 
               cp target/app.jar /opt/app/
               nohup java -jar /opt/app/app.jar > app.log 2>&1 &
 
