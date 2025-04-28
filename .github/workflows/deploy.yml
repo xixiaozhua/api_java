@@ -24,9 +24,10 @@ jobs:
       # 4. 通过 SSH 传输并启动服务
       - uses: appleboy/ssh-action@v1
         with:
-            host: ${{ secrets.SERVER_IP }}
-            username: ${{ secrets.DEPLOY_USER }}
+            # host: ${{ secrets.SERVER_IP }}
+            # username: ${{ secrets.DEPLOY_USER }}
             key: ${{ secrets.SSH_PRIVATE_KEY }}
+            known_hosts: ${{ secrets.known_hosts }}
           
             script: |
               pkill -f "java -jar app.jar" || true 
