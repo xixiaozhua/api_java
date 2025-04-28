@@ -16,7 +16,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          
+
 
       # 3. Maven 打包
       - run: mvn clean package -DskipTests  # 跳过测试加快速度:ml-citation{ref="1,4" data="citationList"}
@@ -24,9 +24,9 @@ jobs:
       # 4. 通过 SSH 传输并启动服务
       - uses: appleboy/ssh-action@v1
         with:
-          host: 47.99.171.17
-          username: deploye
-          key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBpW93QzcQZzC4xyPLWChAERmhTgWX/R0YdQXdi/Vo54 github-actions-deploy-key
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             # 强制覆盖旧文件并重启
             pkill -f "java -jar app.jar" || true  # 终止已有进程:ml-citation{ref="3,7" data="citationList"}
