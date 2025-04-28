@@ -24,9 +24,9 @@ jobs:
       # 4. 通过 SSH 传输并启动服务
       - uses: appleboy/ssh-action@v1
         with:
-            host: 47.99.171.17
-            username: deploye
-            key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINSVwQNCnzjYvUueu9l5fx1JXVVLjy6t++Bu1dSIxdUK github-actions-deploy-key
+            host: ${{ secrets.SERVER_IP }}
+            username: ${{ secrets.DEPLOY_USER }}
+            key: ${{ secrets.SSH_PRIVATE_KEY }}
           
             script: |
               pkill -f "java -jar app.jar" || true 
