@@ -1,0 +1,32 @@
+name: Simple Java Deploy
+
+on:
+  push:
+    branches: [ main ]  # 仅 main 分支触发
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 代码检出
+      - uses: actions/checkout@v4
+
+      # 2. 设置 JDK 环境
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+
+      # 3. Maven 打包
+      - run: mvn clean package -DskipTests  # 跳过测试加快速度:ml-citation{ref="1,4" data="citationList"}
+
+      # 4. 通过 SSH 传输并启动服务
+      - uses: appleboy/ssh-action@v1
+        with:
+          host: 47.99.171.17
+          username: deploye
+          # key: 
+          script: |
+            # 强制覆盖旧文件并重启
+            pkill -f "java -jar app.jar" || true  # 终止已有进程:ml-citation{ref="3,7" data="citationList"}
+            cp target/app.jar /opt/app/
+            nohup java -jar /opt/app/app.jar > app.log 2>&1 &
