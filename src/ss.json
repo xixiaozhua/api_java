@@ -1,0 +1,100 @@
+{
+  "info": {
+    "name": "B2C 电商平台全量API项目",
+    "version": "1.0.0",
+    "description": "包括用户系统，商品，购物车，订单，支付，售后，运营模块，且带Mock数据（中英文）"
+  },
+  "modules": [
+    {
+      "name": "用户系统 User",
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/login",
+          "description": "用户登录 Login",
+          "mock": {
+            "request": {
+              "username": "test_user",
+              "password": "123456"
+            },
+            "response": {
+              "token": "abcdefg123456",
+              "user_id": 1001
+            }
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/register",
+          "description": "用户注册 Register",
+          "mock": {
+            "request": {
+              "username": "new_user",
+              "password": "password123"
+            },
+            "response": {
+              "message": "Registration successful"
+            }
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/user/profile",
+          "description": "获取用户信息 Get User Info",
+          "mock": {
+            "response": {
+              "nickname": "Tom",
+              "gender": "male",
+              "avatar": "https://example.com/avatar.jpg"
+            }
+          }
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/user/profile",
+          "description": "修改用户信息 Update User Info",
+          "mock": {
+            "request": {
+              "nickname": "Tommy",
+              "gender": "male"
+            },
+            "response": {
+              "message": "Update successful"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "商品模块 Product",
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/v1/products",
+          "description": "商品列表 Product List",
+          "mock": {
+            "response": {
+              "products": [
+                { "id": 1, "name": "iPhone 15", "price": 999 },
+                { "id": 2, "name": "Samsung S24", "price": 899 }
+              ]
+            }
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/products/{id}",
+          "description": "商品详情 Product Detail",
+          "mock": {
+            "response": {
+              "id": 1,
+              "name": "iPhone 15",
+              "price": 999,
+              "description": "Latest Apple smartphone"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

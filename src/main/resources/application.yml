@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://118.31.36.179:3306/test_database?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    username: api
+    password: linlin
+  jpa:
+    open-in-view: false
+
+  redis:
+    host: 118.31.36.179
+    port: 6379
+    password: linlin
+    database: 0
+
+  rocketmq:
+    name-server: 118.31.36.179:9876
+    producer:
+      group: default-group
+    # access-key: your-access-key
+    # secret-key: your-secret-key
+
+  jwt:
+    secret: "xianzaishierlingerwunainsiyueershiliurixingqiliuxiawushisandianwushiqifen" # Valid Base64 string
+    expiration: 86400000  # 24 hours in milliseconds
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.example.apiservice.entity
+
+flyway:
+  baselineOnMigrate: true
+  baselineVersion: 1
