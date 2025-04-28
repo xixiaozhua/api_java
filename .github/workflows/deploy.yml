@@ -21,15 +21,14 @@ jobs:
       # 3. Maven 打包
       - run: mvn clean package -DskipTests  # 跳过测试加快速度:ml-citation{ref="1,4" data="citationList"}
 
-      # 4. 通过 SSH 传输并启动服务
-      - uses: appleboy/ssh-action@v1
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@master
         with:
-            host: ${{ secrets.SERVER_IP }}
-            username: ${{ secrets.DEPLOY_USER }}
-            key: ${{ secrets.SSH_PRIVATE_KEY }}
-          
-            script: |
-              pkill -f "java -jar app.jar" || true 
-              cp target/app.jar /opt/app/
-              nohup java -jar /opt/app/app.jar > app.log 2>&1 &
-
+          host: ${{ secrets.SERVER_HOST }} # 服务器地址
+          username: ${{ secrets.SERVER_USERNAME }} # 服务器用户名，通常是部署用户
+          key: ${{ secrets.SERVER_PRIVATE_KEY }} # 私钥内容，存储在GitHub Secrets中
+          script: |  # 执行部署脚本，例如停止旧服务，启动新服务等
+            cd /path/to/your/app  # 切换到应用目录
+            git pull origin main  # 拉取最新代码，根据您的分支名修改
+            # 停止旧服务，启动新服务等操作...
+            sudo systemctl restart your-service-name
