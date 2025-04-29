@@ -24,4 +24,4 @@ jobs:
 
 
     - name: Running Test Scenario
-      run: apifox run --access-token APS-hyzc5XL3ymjLJGyPJyzrYY3vobogeXzO -t 6465078 -f 7280007 -n 1 -r html,cli --upload-report
+      run: apifox run --access-token APS-hyzc5XL3ymjLJGyPJyzrYY3vobogeXzO -f 7280007 -e 32525336 -n 1 -r html,cli --upload-report
