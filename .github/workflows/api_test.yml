@@ -21,6 +21,7 @@ jobs:
       run: |
         echo "118.31.36.179:80 dev-cn.your-api-server.com" | sudo tee -a /etc/hosts
         sudo systemctl restart systemd-resolved  # 刷新DNS缓存
+        sudo systemd-resolve --flush-caches
 
 
     - name: Running Test Scenario
