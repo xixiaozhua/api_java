@@ -17,10 +17,5 @@ jobs:
     - name: Install Apifox CLI
       run: npm install -g apifox-cli
 
-    - name: 修改hosts文件
-      run: |
-        echo "118.31.36.179 dev-cn.your-api-server.com" | sudo tee -a /etc/hosts
-        sudo systemctl restart systemd-resolved
-
     - name: Running Test Scenario
       run: apifox run --access-token APS-hyzc5XL3ymjLJGyPJyzrYY3vobogeXzO -f 7280007 -e 32525336 -n 1 -r html,cli --upload-report
