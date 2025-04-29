@@ -17,5 +17,11 @@ jobs:
     - name: Install Apifox CLI
       run: npm install -g apifox-cli
 
+    - name: 修改hosts文件
+      run: |
+        echo "118.31.36.179 http://test.test.com" | sudo tee -a /etc/hosts
+        sudo systemctl restart systemd-resolved  # 刷新DNS缓存
+
+
     - name: Running Test Scenario
-      run: apifox run --access-token APS-hyzc5XL3ymjLJGyPJyzrYY3vobogeXzO -t 6465078 -e 32524291 -n 1 -r html,cli --upload-report
+      run: apifox run --access-token APS-hyzc5XL3ymjLJGyPJyzrYY3vobogeXzO -t 6465078 -f 7280007 -n 1 -r html,cli --upload-report
