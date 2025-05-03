@@ -95,6 +95,16 @@ public class UserController {
         
         User user = userService.getUserByPhone(phone);
         
+        if (user == null) {
+            return ResponseEntity.ok().body(
+                new HashMap<String, Object>() {{
+                    put("code", ResultCode.BAD_REQUEST.getCode());
+                    put("message", "用户不存在");
+                    put("data", null);
+                }}
+            );
+        }
+        
         // 修改响应体构建方式
         return ResponseEntity.ok().body(
             new HashMap<String, Object>() {{
@@ -119,6 +129,16 @@ public class UserController {
         String phone = authentication.getName();
         
         Long addressId = userService.createAddress(phone, request);
+        
+        if (addressId == null) {
+            return ResponseEntity.ok().body(
+                new HashMap<String, Object>() {{
+                    put("code", ResultCode.BAD_REQUEST.getCode());
+                    put("message", "用户不存在");
+                    put("data", null);
+                }}
+            );
+        }
         
         return ResponseEntity.ok().body(
             new HashMap<String, Object>() {{

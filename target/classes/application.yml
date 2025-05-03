@@ -3,12 +3,31 @@ server:
 
 spring:
   datasource:
+    hikari:
+      leak-detection-threshold: 2000
+      maximum-pool-size: 50
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 300000
+      max-lifetime: 600000
+      validation-timeout: 3000
+      connection-test-query: SELECT 1
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://118.31.36.179:3306/test_database?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://118.31.36.179:3306/shopdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&autoReconnect=true
     username: api
     password: linlin
   jpa:
+    hibernate:
+      ddl-auto: update  # 每次启动清空并重建表结构
+    show-sql: true
+    generate-ddl: true
     open-in-view: false
+    properties:
+      hibernate:
+        jdbc.batch_size: 50
+        order_inserts: true
+        order_updates: true
+        jdbc.batch_versioned_data: true
 
   redis:
     host: 118.31.36.179
@@ -31,6 +50,6 @@ mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.example.apiservice.entity
 
-flyway:
-  baselineOnMigrate: true
-  baselineVersion: 1
+
+    
+

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.util.Map;
+import java.util.Optional;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import com.example.apiservice.common.enums.ResultCode;
 import com.example.apiservice.entity.User;
 import com.example.apiservice.service.UserService;
 import com.example.apiservice.util.JwtUtil;
+import com.example.apiservice.repository.UserRepository;
 
 @RequiredArgsConstructor
 @RestController
@@ -20,6 +22,7 @@ import com.example.apiservice.util.JwtUtil;
 public class AuthController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
 
     @Data
     public static class RegisterRequest {
@@ -35,15 +38,32 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        User user = userService.createUser(request.phone, request.password);
+        // 直接查询用户是否存在，避免不必要的密码加密
+        Optional<User> existingUser = userRepository.findByPhone(request.phone);
+        
+        User user;
+        boolean isNewUser = false;
+        
+        if (existingUser.isPresent()) {
+            // 用户已存在，直接使用
+            user = existingUser.get();
+        } else {
+            // 创建新用户，只在需要时执行密码加密
+            user = userService.createUser(request.phone, request.password);
+            isNewUser = true;
+        }
+        
         String token = jwtUtil.generateToken(user.getPhone());
+        
+        String message = isNewUser ? "注册成功" : "用户已存在，已成功登录";
         
         return ResponseEntity.ok(Map.of(
             "code", ResultCode.SUCCESS.getCode(),
-            "message", "注册成功",
+            "message", message,
             "data", Map.of(
                 "token", token,
-                "user_id", user.getId()
+                "user_id", user.getId(),
+                "is_new_user", isNewUser
             )
         ));
     }

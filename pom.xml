@@ -108,21 +108,19 @@
             <version>5.0.0</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <version>10.11.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-mysql</artifactId>
-            <version>10.11.0</version>
-        </dependency>
+        
     
       <dependency>
         <groupId>org.hibernate.orm</groupId>
         <artifactId>hibernate-core</artifactId>
         <version>6.4.2.Final</version>
+      </dependency>
+
+
+      <dependency>
+          <groupId>org.mybatis</groupId>
+          <artifactId>mybatis-migrations</artifactId>
+          <version>3.3.2</version>
       </dependency>
     </dependencies>
 
@@ -136,6 +134,20 @@
                         <arg>-Xlint:-options</arg>
                     </compilerArgs>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.example.apiservice.ApiServiceApplication</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
