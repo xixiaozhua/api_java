@@ -1,4 +1,0 @@
-flyway:
-  baselineOnMigrate: true
-  baselineVersion: 1
-  enabled: true

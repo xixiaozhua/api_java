@@ -18,9 +18,9 @@ spring:
     password: linlin
   jpa:
     hibernate:
-      ddl-auto: update  # 每次启动清空并重建表结构
+      ddl-auto: validate  # 改为验证模式
+    generate-ddl: false    # 禁用自动生成
     show-sql: true
-    generate-ddl: true
     open-in-view: false
     properties:
       hibernate:
