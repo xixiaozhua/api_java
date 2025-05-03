@@ -17,65 +17,59 @@ public class JwtUtil {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
     
     // 添加缓存，提高性能
-    private Map<String, Claims> tokenCache = new ConcurrentHashMap<>();
-    private static final int MAX_CACHE_SIZE = 1000; // 最大缓存数量
+    private Map<String, String> tokenCache = new ConcurrentHashMap<>();  // 修改为String缓存
     
     @Value("${spring.jwt.secret}")
     private String secret;
     @Value("${spring.jwt.expiration}")
     private Long expiration;
     
-    private Key signingKey;
+    private final Key signingKey;  // 改为final字段
 
-    private Key getSigningKey() {
-        if (signingKey == null) {
-            signingKey = Keys.hmacShaKeyFor(secret.getBytes());
-        }
-        return signingKey;
+    public JwtUtil(
+        @Value("${spring.jwt.secret}") String secret,
+        @Value("${spring.jwt.expiration}") Long expiration) {
+        this.signingKey = Keys.hmacShaKeyFor(secret.getBytes());  // 需要先初始化secret字段
+        this.secret = secret;  // 调整顺序
+        this.expiration = expiration;
     }
 
     public String generateToken(String phone) {
-        return Jwts.builder()
+        String cacheKey = phone + "_" + (System.currentTimeMillis() / expiration);
+        return tokenCache.computeIfAbsent(cacheKey, k -> 
+            Jwts.builder()
                 .setSubject(phone)
-                .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSigningKey())
-                .compact();
+                .signWith(signingKey)
+                .compact()
+        );
     }
 
     public Claims parseToken(String token) {
-        // 先尝试从缓存获取
-        Claims cachedClaims = tokenCache.get(token);
-        if (cachedClaims != null) {
-            return cachedClaims;
-        }
-        
         try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
+            return Jwts.parserBuilder()
+                    .setSigningKey(signingKey)  // 直接使用初始化好的密钥
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-            
-            // 缓存解析结果，避免频繁解析相同的token
-            if (tokenCache.size() < MAX_CACHE_SIZE) {
-                tokenCache.put(token, claims);
-            }
-            
-            return claims;
         } catch (Exception e) {
             logger.error("JWT解析错误", e);
             return null;
         }
     }
-    
+
     // 清理过期的缓存条目
     public void cleanCache() {
         long now = System.currentTimeMillis();
         tokenCache.entrySet().removeIf(entry -> {
             try {
-                Date expiration = entry.getValue().getExpiration();
-                return expiration != null && expiration.getTime() < now;
+                // 解析token获取过期时间
+                Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(signingKey)
+                    .build()
+                    .parseClaimsJws(entry.getValue())
+                    .getBody();
+                return claims.getExpiration().getTime() < now;
             } catch (Exception e) {
                 return true;
             }

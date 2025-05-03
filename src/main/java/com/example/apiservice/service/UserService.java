@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -41,7 +42,7 @@ public class UserService {
         if (request.getIsDefault()) {
             addressRepository.updateNonDefaultAddresses(user.getId());
         }
-
+    
         Address newAddress = new Address();
         newAddress.setUser(user);  // 使用JPA关系映射
         newAddress.setReceiver(request.getReceiver());
@@ -52,15 +53,14 @@ public class UserService {
         newAddress.setAddress(request.getAddress());
         newAddress.setIsDefault(request.getIsDefault());
         newAddress.setCreatedAt(java.time.Instant.now());
-
+    
         return addressRepository.save(newAddress).getId();
     }
 
-    public User createUser(String phone, String password) {
-        // 直接创建新用户，不再检查是否存在（调用方应该先检查）
+    @Transactional(timeout = 3)  // 添加事务超时限制
+    public User createUser(String phone) {
         User user = new User();
         user.setPhone(phone);
-        user.setPassword(passwordEncoder.encode(password));
         user.setCreatedAt(java.time.Instant.now());
         return userRepository.save(user);
     }
@@ -169,5 +169,14 @@ public class UserService {
     @Bean
     public ExecutorService addressThreadPool() {
         return Executors.newFixedThreadPool(10); // 建议添加队列容量和拒绝策略
+    }
+
+    public void updateUserPassword(String phone, String newPassword) {
+        Optional<User> userOpt = userRepository.findByPhone(phone);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+        }
     }
 }

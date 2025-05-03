@@ -4,12 +4,12 @@ server:
 spring:
   datasource:
     hikari:
-      leak-detection-threshold: 2000
-      maximum-pool-size: 50
+      maximum-pool-size: 50  
+      connection-timeout: 2000  
+      idle-timeout: 60000  
+      max-lifetime: 120000  
+      leak-detection-threshold: 5000
       minimum-idle: 5
-      connection-timeout: 30000
-      idle-timeout: 300000
-      max-lifetime: 600000
       validation-timeout: 3000
       connection-test-query: SELECT 1
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -20,7 +20,8 @@ spring:
     hibernate:
       ddl-auto: validate  # 改为验证模式
     generate-ddl: false    # 禁用自动生成
-    show-sql: true
+    show-sql: false
+    
     open-in-view: false
     properties:
       hibernate:
@@ -28,6 +29,8 @@ spring:
         order_inserts: true
         order_updates: true
         jdbc.batch_versioned_data: true
+        generate_statistics: false
+        session.events.log.LOG_QUERIES_SLOWER_THAN_MS: 100
 
   redis:
     host: 118.31.36.179
@@ -49,6 +52,10 @@ spring:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.example.apiservice.entity
+
+sms:
+  code:
+    expire-time: 300  # 5分钟有效期
 
 
     

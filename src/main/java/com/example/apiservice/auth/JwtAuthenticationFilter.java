@@ -32,9 +32,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
-            String authHeader = request.getHeader("Authorization");
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                String token = authHeader.substring(7);
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
                 
                 // 检查是否已缓存该token
                 String cachedPhone = validTokens.get(token);
@@ -64,17 +64,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
     
     private void setAuthentication(String phone, HttpServletRequest request) {
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                phone, null, null);
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        phone, null, null);
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
     }
     
-    // 清理缓存中过期的token
-    public void cleanTokenCache() {
-        // 这里可以定期执行清理操作，或者引入令牌过期时间
-        if (validTokens.size() > 800) {
-            validTokens.clear();
-        }
-    }
+
 }

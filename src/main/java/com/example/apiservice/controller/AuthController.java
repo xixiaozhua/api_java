@@ -12,17 +12,25 @@ import lombok.RequiredArgsConstructor;
 
 import com.example.apiservice.common.enums.ResultCode;
 import com.example.apiservice.entity.User;
+import com.example.apiservice.service.SmsService;
 import com.example.apiservice.service.UserService;
 import com.example.apiservice.util.JwtUtil;
 import com.example.apiservice.repository.UserRepository;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
+    private final SmsService smsService;  // 修改为接口类型
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+
+    public AuthController(UserService userService, JwtUtil jwtUtil, UserRepository userRepository, SmsService smsService) {
+        this.userService = userService;
+        this.jwtUtil = jwtUtil;
+        this.userRepository = userRepository;
+        this.smsService = smsService;
+    }
 
     @Data
     public static class RegisterRequest {
@@ -31,30 +39,27 @@ public class AuthController {
         
         @NotBlank(message = "验证码不能为空")
         private String code;
-        
-        @Size(min = 6, message = "密码至少6位")
-        private String password;
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        // 直接查询用户是否存在，避免不必要的密码加密
-        Optional<User> existingUser = userRepository.findByPhone(request.phone);
-        
-        User user;
-        boolean isNewUser = false;
-        
-        if (existingUser.isPresent()) {
-            // 用户已存在，直接使用
-            user = existingUser.get();
-        } else {
-            // 创建新用户，只在需要时执行密码加密
-            user = userService.createUser(request.phone, request.password);
-            isNewUser = true;
+        // 验证验证码
+        if (!smsService.verifyCode(request.phone, request.code)) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "code", ResultCode.INVALID_CODE.getCode(),
+                "message", "验证码错误或已过期"
+            ));
         }
         
-        String token = jwtUtil.generateToken(user.getPhone());
+        // 优化后的存在性判断
+        boolean userExists = userRepository.existsByPhone(request.phone);
+        boolean isNewUser = !userExists;  // 新增判断逻辑
         
+        User user = userExists ? 
+            userRepository.findByPhone(request.phone).get() : 
+            userService.createUser(request.phone);
+        
+        String token = jwtUtil.generateToken(user.getPhone());
         String message = isNewUser ? "注册成功" : "用户已存在，已成功登录";
         
         return ResponseEntity.ok(Map.of(
@@ -82,6 +87,43 @@ public class AuthController {
         User user = userService.authenticateUser(request.phone, request.password);
         String token = jwtUtil.generateToken(user.getPhone());
         
+        return ResponseEntity.ok(Map.of(
+            "code", ResultCode.SUCCESS.getCode(),
+            "msg", "登录成功",
+            "data", Map.of(
+                "token", token,
+                "user_id", user.getId()
+            )
+        ));
+    }
+
+    @Data
+    public static class SmsLoginRequest {
+        @NotBlank(message = "手机号不能为空")
+        private String phone;
+        
+        @NotBlank(message = "验证码不能为空")
+        private String code;
+    }
+
+    @PostMapping("/sms-login")
+    public ResponseEntity<?> smsLogin(@RequestBody SmsLoginRequest request) {
+        if (!smsService.verifyCode(request.phone, request.code)) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "code", ResultCode.INVALID_CODE.getCode(),
+                "message", "验证码错误或已过期"
+            ));
+        }
+
+        User user = userService.getUserByPhone(request.phone);
+        if (user == null) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "code", ResultCode.USER_NOT_FOUND.getCode(),
+                "message", "用户不存在"
+            ));
+        }
+
+        String token = jwtUtil.generateToken(user.getPhone());
         return ResponseEntity.ok(Map.of(
             "code", ResultCode.SUCCESS.getCode(),
             "msg", "登录成功",

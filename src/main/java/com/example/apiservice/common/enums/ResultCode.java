@@ -8,7 +8,9 @@ public enum ResultCode {
     NOT_FOUND(404, "资源不存在"),
     INTERNAL_ERROR(500, "服务器内部错误"),
     VALIDATION_ERROR(40003, "Validation Error"),
-    INTERNAL_SERVER_ERROR(50000, "Internal Server Error");
+    INTERNAL_SERVER_ERROR(50000, "Internal Server Error"),
+    INVALID_CODE(40010, "验证码错误或已过期"),
+    USER_NOT_FOUND(40011, "用户不存在");
 
     private final int code;
     private final String message;

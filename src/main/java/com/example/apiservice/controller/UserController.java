@@ -250,4 +250,24 @@ public class UserController {
             }}
         );
     }
+    
+    public static class SetPasswordRequest {
+        private String password;
+    }
+
+    @PostMapping("/set-password")
+    public ResponseEntity<?> setPassword(@RequestBody SetPasswordRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String phone = authentication.getName();
+
+        userService.updateUserPassword(phone, request.password);
+
+        return ResponseEntity.ok().body(
+            new HashMap<String, Object>() {{
+                put("code", ResultCode.SUCCESS.getCode());
+                put("message", "密码设置成功");
+                put("data", null);
+            }}
+        );
+    }
 }
