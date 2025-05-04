@@ -2,6 +2,10 @@ package com.example.apiservice.controller;
 
 import com.example.apiservice.entity.User;
 import com.example.apiservice.service.UserService;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -251,7 +255,9 @@ public class UserController {
         );
     }
     
+    @Data
     public static class SetPasswordRequest {
+        @NotBlank(message = "密码不能为空")
         private String password;
     }
 

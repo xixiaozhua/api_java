@@ -2,6 +2,25 @@ server:
   port: 8080
 
 spring:
+  data:
+    redis:
+      host: 118.31.36.179
+      port: 6379
+      password: linlin
+      database: 0
+      timeout: 3000
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: 3000
+          test-on-borrow: true
+          test-while-idle: true
+     
+  jackson:
+    property-naming-strategy: SNAKE_CASE  # 确保字段名匹配
+    default-property-inclusion: non_null  # 忽略空字段
   datasource:
     hikari:
       maximum-pool-size: 50  
@@ -32,11 +51,7 @@ spring:
         generate_statistics: false
         session.events.log.LOG_QUERIES_SLOWER_THAN_MS: 100
 
-  redis:
-    host: 118.31.36.179
-    port: 6379
-    password: linlin
-    database: 0
+  
 
   rocketmq:
     name-server: 118.31.36.179:9876
@@ -56,6 +71,10 @@ mybatis:
 sms:
   code:
     expire-time: 300  # 5分钟有效期
+
+logging:
+  level:
+    io.lettuce.core: DEBUG
 
 
     

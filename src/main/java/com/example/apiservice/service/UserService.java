@@ -175,6 +175,9 @@ public class UserService {
         Optional<User> userOpt = userRepository.findByPhone(phone);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
+            if (newPassword == null || newPassword.trim().isEmpty()) {
+                throw new IllegalArgumentException("密码不能为空");
+            }
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);
         }

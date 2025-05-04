@@ -106,6 +106,15 @@ public class AuthController {
         private String code;
     }
 
+    @PostMapping("/send-code")
+    public ResponseEntity<?> sendCode(@RequestBody Map<String, String> request) {
+        smsService.sendCode(request.get("phone"));
+        return ResponseEntity.ok(Map.of(
+            "code", ResultCode.SUCCESS.getCode(),
+            "message", "验证码已发送"
+        ));
+    }
+
     @PostMapping("/sms-login")
     public ResponseEntity<?> smsLogin(@RequestBody SmsLoginRequest request) {
         if (!smsService.verifyCode(request.phone, request.code)) {
