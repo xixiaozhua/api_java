@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AddressRepository extends JpaRepository<Address, Long> {
-    List<Address> findByPhone(String phone);
+    List<Address> findByUserId(Long userId);
 
     @Modifying
     @Query("UPDATE Address a SET a.isDefault = false WHERE a.user.id = :userId")
     void updateNonDefaultAddresses(@Param("userId") Long userId);
 
-    @Query("SELECT a FROM Address a WHERE a.id = :id AND a.user.id = :userId AND a.isDeleted = 0")
+    @Query("SELECT a FROM Address a WHERE a.id = :id AND a.user.id = :userId")
     Optional<Address> findByIdAndUserId(@Param("id") Long id, @Param("userId") Long userId);
 }

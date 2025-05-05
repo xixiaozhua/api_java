@@ -6,7 +6,7 @@ import com.example.apiservice.entity.User;
 import com.example.apiservice.repository.AddressRepository;
 import com.example.apiservice.repository.UserRepository;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,7 +32,8 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Long createAddress(String phone, UserController.AddressCreateRequest request) {
+    @Transactional
+    public Long createAddress(String phone, UserController.AddressRequest request) {
         Optional<User> userOpt = userRepository.findByPhone(phone);
         if (userOpt.isEmpty()) {
             return null; // 用户不存在返回null
@@ -44,7 +45,7 @@ public class UserService {
         }
     
         Address newAddress = new Address();
-        newAddress.setUser(user);  // 使用JPA关系映射
+        newAddress.setUser(user);
         newAddress.setReceiver(request.getReceiver());
         newAddress.setPhone(request.getPhone());
         newAddress.setProvince(request.getProvince());
@@ -61,8 +62,8 @@ public class UserService {
     public User createUser(String phone) {
         User user = new User();
         user.setPhone(phone);
-        user.setCreatedAt(java.time.Instant.now());
-        return userRepository.save(user);
+        user.setCreatedAt(Instant.now());
+        return userRepository.save(user); // 移除空密码初始化
     }
 
     public User getUserByPhone(String phone) {
@@ -86,42 +87,47 @@ public class UserService {
     public List<Address> getUserAddresses(String phone) {
         Optional<User> userOpt = userRepository.findByPhone(phone);
         if (userOpt.isEmpty()) {
-            return List.of(); // 返回空列表而不是抛出异常
+            return List.of(); 
         }
-        return addressRepository.findByPhone(userOpt.get().getPhone());
+        // 改为通过用户ID查询地址
+        return addressRepository.findByUserId(userOpt.get().getId());
     }
 
-    public void updateUserProfile(String phone, UserController.UpdateProfileRequest request) {
+    public void updateUserProfile(String phone, UserController.ProfileRequest request) {
         Optional<User> userOpt = userRepository.findByPhone(phone);
         if (userOpt.isEmpty()) {
-            return; // 如果用户不存在，静默返回
+            return; 
         }
         
         User user = userOpt.get();
         user.setNickname(request.getNickname());
         user.setGender(request.getGender());
         user.setAvatar(request.getAvatar());
+        user.setUpdatedAt(Instant.now());
         
         userRepository.save(user);
     }
 
-    public void updateAddress(String phone, Long addressId, UserController.AddressUpdateRequest request) {
+    @Transactional
+    public void updateAddress(String phone, Long addressId, UserController.AddressRequest request) {
         Optional<User> userOpt = userRepository.findByPhone(phone);
         if (userOpt.isEmpty()) {
-            return; // 如果用户不存在，静默返回
+            return;
         }
-
+    
         User user = userOpt.get();
         Optional<Address> addressOpt = addressRepository.findByIdAndUserId(addressId, user.getId());
         if (addressOpt.isEmpty()) {
-            return; // 如果地址不存在，静默返回
+            return;
         }
-
+    
         Address address = addressOpt.get();
+        
+        // 新增逻辑：如果设置为默认地址，则先清除其他默认地址
         if (request.getIsDefault()) {
             addressRepository.updateNonDefaultAddresses(user.getId());
         }
-
+    
         address.setReceiver(request.getReceiver());
         address.setPhone(request.getPhone());
         address.setProvince(request.getProvince());
@@ -130,7 +136,7 @@ public class UserService {
         address.setAddress(request.getAddress());
         address.setIsDefault(request.getIsDefault());
         address.setUpdatedAt(java.time.Instant.now());
-
+    
         addressRepository.save(address);
     }
 
@@ -147,7 +153,7 @@ public class UserService {
         }
         
         Address address = addressOpt.get();
-        address.setIsDeleted(1);  // 软删除标记
+        address.setIsDeleted(true);  // 软删除标记
         addressRepository.save(address);
     }
 
@@ -158,7 +164,7 @@ public class UserService {
         }
         
         User user = userOpt.get();
-        user.setIsDeleted(1);
+        user.setIsDeleted(true);
         userRepository.save(user);
     }
 

@@ -3,13 +3,8 @@ package com.example.apiservice.controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import java.util.Map;
-import java.util.Optional;
-
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-
 import com.example.apiservice.common.enums.ResultCode;
 import com.example.apiservice.entity.User;
 import com.example.apiservice.service.SmsService;
@@ -89,7 +84,7 @@ public class AuthController {
         
         return ResponseEntity.ok(Map.of(
             "code", ResultCode.SUCCESS.getCode(),
-            "msg", "登录成功",
+            "message", "登录成功",
             "data", Map.of(
                 "token", token,
                 "user_id", user.getId()
@@ -135,7 +130,7 @@ public class AuthController {
         String token = jwtUtil.generateToken(user.getPhone());
         return ResponseEntity.ok(Map.of(
             "code", ResultCode.SUCCESS.getCode(),
-            "msg", "登录成功",
+            "message", "登录成功",
             "data", Map.of(
                 "token", token,
                 "user_id", user.getId()
@@ -147,7 +142,7 @@ public class AuthController {
     public ResponseEntity<?> logout() {
         return ResponseEntity.ok(Map.of(
             "code", ResultCode.SUCCESS.getCode(),
-            "msg", "退出成功",
+            "message", "退出成功",
             "data", Map.of()
         ));
     }

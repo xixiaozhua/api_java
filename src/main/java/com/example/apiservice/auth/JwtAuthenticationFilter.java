@@ -31,7 +31,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        try {
+    // 放行验证码登录和注册接口
+    if (request.getServletPath().startsWith("/api/v1/auth/sms-login") 
+    || request.getServletPath().startsWith("/api/v1/auth/register")) {
+    filterChain.doFilter(request, response);
+    return;
+    }
+
+    try {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
@@ -61,6 +68,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 清理线程局部变量
             currentToken.remove();
         }
+
+        
     }
     
     private void setAuthentication(String phone, HttpServletRequest request) {
@@ -69,6 +78,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
     }
-    
 
 }
